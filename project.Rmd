@@ -1,0 +1,85 @@
+---
+title: "project"
+author: "Chaganti Venkata Kanishk"
+date: "4/8/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(faraway)
+library(MASS)
+library(car)
+```
+
+
+
+#  Visualization Of the dataset
+
+
+```{r}
+red <- read.csv("winequality-white.csv")
+head(red)
+```
+```{r}
+names(red)
+```
+```{r}
+table(red$quality)
+```
+
+# Scaterplots 
+```{r}
+red$quality <- as.integer(red$quality)
+
+for (i in c(1:11)){
+  plot(red[, i], red[, "quality"], xlab = names(red)[i],
+         ylab = "quality",col = "firebrick")
+  abline(lm(red[, "quality"] ~ red[ ,i]), lty = 2, lwd = 2)
+}
+
+```
+
+
+
+# multicollinearity 
+
+```{r}
+
+lm <- lm(quality~.,data = red) 
+vif_values<- round(vif(lm),2)
+vif_values
+```
+```{r}
+barplot(vif_values, main = "VIF Values", horiz = TRUE, col = "steelblue")
+abline(v = 5, lwd = 3, lty = 2)
+```
+## Corelation matrix 
+```{r}
+reduced_red <- red[, c("fixed.acidity", "volatile.acidity","citric.acid","chlorides","free.sulfur.dioxide","total.sulfur.dioxide","pH","sulphates")]
+cor(reduced_red)
+```
+
+# Box-Cox Transformations
+
+```{r}
+boxcox(lm, lambda=seq(0.3, 0.65, by=0.05))
+summary(powerTransform(lm))
+```
+# variable selection
+
+```{r}
+lm2<- step(lm)
+summary(lm2)
+AIC(lm,lm2)
+```
+
+```{r}
+summary(lm)
+```
+
+
+
+
+
